@@ -240,16 +240,187 @@ const docTemplate = `{
                 }
             }
         },
-        "/games": {
+        "/comments": {
             "get": {
-                "description": "Get a list of Games.",
+                "description": "Get a list of Comments.",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Games"
+                    "Comment"
                 ],
-                "summary": "Get all Games.",
+                "summary": "Get all Comments.",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Comment"
+                            }
+                        }
+                    }
+                }
+            },
+            "post": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Creating a new Comment.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comment"
+                ],
+                "summary": "Create New Comment.",
+                "parameters": [
+                    {
+                        "description": "the body to create a new Comment",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.commentInput"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                }
+            }
+        },
+        "/comments/{id}": {
+            "get": {
+                "description": "Get a Comment by id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comment"
+                ],
+                "summary": "Get Comment.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Comment id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "description": "Delete a Comment by id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comment"
+                ],
+                "summary": "Delete one Comment.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Comment id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "boolean"
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
+                "description": "Update Comment by id.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Comment"
+                ],
+                "summary": "Update Comment.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Comment id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "the body to update a Comment",
+                        "name": "Body",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/controllers.commentInput"
+                        }
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/models.Comment"
+                        }
+                    }
+                }
+            }
+        },
+        "/games": {
+            "get": {
+                "description": "Get a list of Game.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Game"
+                ],
+                "summary": "Get all Game.",
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -437,11 +608,6 @@ const docTemplate = `{
         },
         "/games/{id}/reviews": {
             "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
                 "description": "Get all Reviews by GameId.",
                 "produces": [
                     "application/json"
@@ -456,13 +622,6 @@ const docTemplate = `{
                         "description": "Game id",
                         "name": "id",
                         "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
-                        "name": "Authorization",
-                        "in": "header",
                         "required": true
                     }
                 ],
@@ -760,11 +919,6 @@ const docTemplate = `{
         },
         "/reviews": {
             "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
                 "description": "Get a list of reviews.",
                 "produces": [
                     "application/json"
@@ -773,15 +927,6 @@ const docTemplate = `{
                     "Review"
                 ],
                 "summary": "Get all reviews.",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -838,11 +983,6 @@ const docTemplate = `{
         },
         "/reviews/{id}": {
             "get": {
-                "security": [
-                    {
-                        "BearerToken": []
-                    }
-                ],
                 "description": "Get a Review by id.",
                 "produces": [
                     "application/json"
@@ -858,13 +998,6 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
-                    },
-                    {
-                        "type": "string",
-                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
-                        "name": "Authorization",
-                        "in": "header",
-                        "required": true
                     }
                 ],
                 "responses": {
@@ -877,6 +1010,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
+                "security": [
+                    {
+                        "BearerToken": []
+                    }
+                ],
                 "description": "Delete a review by id.",
                 "produces": [
                     "application/json"
@@ -891,6 +1029,13 @@ const docTemplate = `{
                         "description": "review id",
                         "name": "id",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Authorization. How to input in swagger : 'Bearer \u003cinsert_your_token_here\u003e'",
+                        "name": "Authorization",
+                        "in": "header",
                         "required": true
                     }
                 ],
@@ -954,6 +1099,102 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/reviews/{id}/comments": {
+            "get": {
+                "description": "Get all Comments by ReviewId.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Review"
+                ],
+                "summary": "Get Comments.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Review id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Comment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/comments": {
+            "get": {
+                "description": "Get all Comments by UserId.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get Comments.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Comment"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/users/{id}/reviews": {
+            "get": {
+                "description": "Get all Reviews by UserId.",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "User"
+                ],
+                "summary": "Get Reviews.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "User id",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/models.Review"
+                            }
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -1006,6 +1247,23 @@ const docTemplate = `{
                 }
             }
         },
+        "controllers.commentInput": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "likes": {
+                    "type": "integer"
+                },
+                "review_id": {
+                    "type": "integer"
+                },
+                "user_id": {
+                    "type": "integer"
+                }
+            }
+        },
         "controllers.gameInput": {
             "type": "object",
             "properties": {
@@ -1051,6 +1309,9 @@ const docTemplate = `{
                 },
                 "title": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1065,6 +1326,32 @@ const docTemplate = `{
                 },
                 "nama": {
                     "type": "string"
+                }
+            }
+        },
+        "models.Comment": {
+            "type": "object",
+            "properties": {
+                "content": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "likes": {
+                    "type": "integer"
+                },
+                "review_id": {
+                    "type": "integer"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
@@ -1128,6 +1415,9 @@ const docTemplate = `{
                 },
                 "updated_at": {
                     "type": "string"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         }

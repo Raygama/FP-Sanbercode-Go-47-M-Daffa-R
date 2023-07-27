@@ -71,10 +71,52 @@ func CreateReview(c *gin.Context) {
 		return
 	}
 
-	review := models.Review{GameID: input.GameID, RatingID: input.RatingID, Title: input.Title, Content: input.Content}
+	review := models.Review{GameID: input.GameID, RatingID: input.RatingID, Title: input.Title, Content: input.Content, UserID: input.UserID}
 	db.Create(&review)
 
 	c.JSON(http.StatusOK, gin.H{"data": review})
+}
+
+// GetCommentsByReviewId godoc
+// @Summary Get Comments.
+// @Description Get all Comments by ReviewId.
+// @Tags Review
+// @Produce json
+// @Param id path string true "Review id"
+// @Success 200 {object} []models.Comment
+// @Router /reviews/{id}/comments [get]
+func GetCommentsByReviewId(c *gin.Context) {
+	var comments []models.Comment
+
+	db := c.MustGet("db").(*gorm.DB)
+
+	if err := db.Where("review_id = ?", c.Param("id")).Find(&comments).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": comments})
+}
+
+// GetReviewsByUserId godoc
+// @Summary Get Reviews.
+// @Description Get all Reviews by UserId.
+// @Tags User
+// @Produce json
+// @Param id path string true "User id"
+// @Success 200 {object} []models.Review
+// @Router /users/{id}/reviews [get]
+func GetReviewsByUserId(c *gin.Context) {
+	var reviews []models.Review
+
+	db := c.MustGet("db").(*gorm.DB)
+
+	if err := db.Where("user_id = ?", c.Param("id")).Find(&reviews).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data not found"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": reviews})
 }
 
 // GetReviewById godoc
@@ -159,6 +201,8 @@ func UpdateReview(c *gin.Context) {
 // @Tags Review
 // @Produce json
 // @Param id path string true "review id"
+// @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
+// @Security BearerToken
 // @Success 200 {object} map[string]boolean
 // @Router /reviews/{id} [delete]
 func DeleteReview(c *gin.Context) {

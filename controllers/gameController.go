@@ -18,9 +18,9 @@ type gameInput struct {
 }
 
 // GetAllGames godoc
-// @Summary Get all Games.
-// @Description Get a list of Games.
-// @Tags Games
+// @Summary Get all Game.
+// @Description Get a list of Game.
+// @Tags Game
 // @Produce json
 // @Success 200 {object} []models.Game
 // @Router /games [get]
@@ -86,8 +86,6 @@ func GetGamesById(c *gin.Context) { // Get model if exist
 // @Tags Game
 // @Produce json
 // @Param id path string true "Game id"
-// @Param Authorization header string true "Authorization. How to input in swagger : 'Bearer <insert_your_token_here>'"
-// @Security BearerToken
 // @Success 200 {object} []models.Review
 // @Router /games/{id}/reviews [get]
 func GetReviewsByGameId(c *gin.Context) {

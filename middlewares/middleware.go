@@ -27,7 +27,7 @@ func UserCheckMiddleware() gin.HandlerFunc {
 
 		// Jika role tidak sesuai, berikan pesan error dan hentikan proses.
 		if role != "user" && role != "admin" {
-			c.String(http.StatusForbidden, "Access denied. Require Writer role.")
+			c.String(http.StatusForbidden, "Access denied. Insufficient role.")
 			c.Abort()
 			return
 		}

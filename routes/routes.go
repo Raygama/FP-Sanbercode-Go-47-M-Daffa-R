@@ -23,6 +23,7 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 
 	r.GET("/reviews", controllers.GetAllReview)
 	r.GET("/reviews/:id", controllers.GetReviewById)
+	r.GET("/users/:id/reviews", controllers.GetReviewsByUserId)
 
 	reviewsMiddlewareRoute := r.Group("/reviews")
 	reviewsMiddlewareRoute.Use(middlewares.UserCheckMiddleware())
@@ -59,6 +60,16 @@ func SetupRouter(db *gorm.DB) *gin.Engine {
 	gamesMiddlewareRoute.POST("/", controllers.CreateGames)
 	gamesMiddlewareRoute.PATCH("/:id", controllers.UpdateGames)
 	gamesMiddlewareRoute.DELETE("/:id", controllers.DeleteGames)
+
+	r.GET("/comments", controllers.GetAllComment)
+	r.GET("/comments/:id", controllers.GetCommentById)
+	r.GET("/users/:id/comments", controllers.GetCommentsByUserId)
+
+	commentsMiddlewareRoute := r.Group("/comments")
+	commentsMiddlewareRoute.Use(middlewares.UserCheckMiddleware())
+	commentsMiddlewareRoute.POST("/", controllers.CreateComment)
+	commentsMiddlewareRoute.PATCH("/:id", controllers.UpdateComment)
+	commentsMiddlewareRoute.DELETE("/:id", controllers.DeleteComment)
 
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 

@@ -32,6 +32,17 @@ definitions:
       nama:
         type: string
     type: object
+  controllers.commentInput:
+    properties:
+      content:
+        type: string
+      likes:
+        type: integer
+      review_id:
+        type: integer
+      user_id:
+        type: integer
+    type: object
   controllers.gameInput:
     properties:
       category_id:
@@ -62,6 +73,8 @@ definitions:
         type: integer
       title:
         type: string
+      user_id:
+        type: integer
     type: object
   models.Category:
     properties:
@@ -71,6 +84,23 @@ definitions:
         type: integer
       nama:
         type: string
+    type: object
+  models.Comment:
+    properties:
+      content:
+        type: string
+      created_at:
+        type: string
+      id:
+        type: integer
+      likes:
+        type: integer
+      review_id:
+        type: integer
+      updated_at:
+        type: string
+      user_id:
+        type: integer
     type: object
   models.Game:
     properties:
@@ -112,6 +142,8 @@ definitions:
         type: string
       updated_at:
         type: string
+      user_id:
+        type: integer
     type: object
 info:
   contact:
@@ -262,9 +294,120 @@ paths:
       summary: Get Games.
       tags:
       - Category
+  /comments:
+    get:
+      description: Get a list of Comments.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Comment'
+            type: array
+      summary: Get all Comments.
+      tags:
+      - Comment
+    post:
+      description: Creating a new Comment.
+      parameters:
+      - description: the body to create a new Comment
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.commentInput'
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+      security:
+      - BearerToken: []
+      summary: Create New Comment.
+      tags:
+      - Comment
+  /comments/{id}:
+    delete:
+      description: Delete a Comment by id.
+      parameters:
+      - description: Comment id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            additionalProperties:
+              type: boolean
+            type: object
+      summary: Delete one Comment.
+      tags:
+      - Comment
+    get:
+      description: Get a Comment by id.
+      parameters:
+      - description: Comment id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+      summary: Get Comment.
+      tags:
+      - Comment
+    patch:
+      description: Update Comment by id.
+      parameters:
+      - description: Comment id
+        in: path
+        name: id
+        required: true
+        type: string
+      - description: the body to update a Comment
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.commentInput'
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Comment'
+      security:
+      - BearerToken: []
+      summary: Update Comment.
+      tags:
+      - Comment
   /games:
     get:
-      description: Get a list of Games.
+      description: Get a list of Game.
       produces:
       - application/json
       responses:
@@ -274,9 +417,9 @@ paths:
             items:
               $ref: '#/definitions/models.Game'
             type: array
-      summary: Get all Games.
+      summary: Get all Game.
       tags:
-      - Games
+      - Game
     post:
       description: Creating a new Game.
       parameters:
@@ -396,11 +539,6 @@ paths:
         name: id
         required: true
         type: string
-      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
-        in: header
-        name: Authorization
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -410,8 +548,6 @@ paths:
             items:
               $ref: '#/definitions/models.Review'
             type: array
-      security:
-      - BearerToken: []
       summary: Get Reviews.
       tags:
       - Game
@@ -599,12 +735,6 @@ paths:
   /reviews:
     get:
       description: Get a list of reviews.
-      parameters:
-      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
-        in: header
-        name: Authorization
-        required: true
-        type: string
       produces:
       - application/json
       responses:
@@ -614,8 +744,6 @@ paths:
             items:
               $ref: '#/definitions/models.Review'
             type: array
-      security:
-      - BearerToken: []
       summary: Get all reviews.
       tags:
       - Review
@@ -654,26 +782,6 @@ paths:
         name: id
         required: true
         type: string
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            additionalProperties:
-              type: boolean
-            type: object
-      summary: Delete one Review.
-      tags:
-      - Review
-    get:
-      description: Get a Review by id.
-      parameters:
-      - description: review id
-        in: path
-        name: id
-        required: true
-        type: string
       - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
         in: header
         name: Authorization
@@ -685,9 +793,29 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/models.Review'
+            additionalProperties:
+              type: boolean
+            type: object
       security:
       - BearerToken: []
+      summary: Delete one Review.
+      tags:
+      - Review
+    get:
+      description: Get a Review by id.
+      parameters:
+      - description: review id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.Review'
       summary: Get Review.
       tags:
       - Review
@@ -722,4 +850,67 @@ paths:
       summary: Update Review.
       tags:
       - Review
+  /reviews/{id}/comments:
+    get:
+      description: Get all Comments by ReviewId.
+      parameters:
+      - description: Review id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Comment'
+            type: array
+      summary: Get Comments.
+      tags:
+      - Review
+  /users/{id}/comments:
+    get:
+      description: Get all Comments by UserId.
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Comment'
+            type: array
+      summary: Get Comments.
+      tags:
+      - User
+  /users/{id}/reviews:
+    get:
+      description: Get all Reviews by UserId.
+      parameters:
+      - description: User id
+        in: path
+        name: id
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            items:
+              $ref: '#/definitions/models.Review'
+            type: array
+      summary: Get Reviews.
+      tags:
+      - User
 swagger: "2.0"
