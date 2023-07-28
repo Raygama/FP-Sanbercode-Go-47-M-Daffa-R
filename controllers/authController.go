@@ -51,19 +51,16 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	// Fetch the user's role from the database and set it in the context.
 	err = db.Model(models.User{}).Select("role").Where("username = ?", u.Username).Take(&u).Error
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "failed to fetch user role"})
 		return
 	}
 
-	// Set the user's role in the context.
 	c.Set("userRole", u.Role)
 
 	user := map[string]string{
 		"username": u.Username,
-		"email":    u.Email,
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "login success", "user": user, "token": token})

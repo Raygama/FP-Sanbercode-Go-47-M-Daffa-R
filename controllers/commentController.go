@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"Final/models"
+	"Final/utils/token"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -13,7 +14,6 @@ import (
 
 type commentInput struct {
 	ReviewID int    `json:"review_id"`
-	UserID   int    `json:"user_id"`
 	Content  string `json:"content" gorm:"type:text"`
 	Likes    int    `json:"likes"`
 }
@@ -81,7 +81,7 @@ func CreateComment(c *gin.Context) {
 
 	var input commentInput
 	var review models.Review
-	var user models.User
+
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -92,12 +92,14 @@ func CreateComment(c *gin.Context) {
 		return
 	}
 
-	if err := db.Where("id = ?", input.UserID).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "UserID not found!"})
+	UserID, err := token.ExtractUserID(c)
+	if err != nil {
+		c.String(http.StatusUnauthorized, err.Error())
+		c.Abort()
 		return
 	}
 
-	comment := models.Comment{ReviewID: input.ReviewID, UserID: input.UserID, Content: input.Content, Likes: input.Likes}
+	comment := models.Comment{ReviewID: input.ReviewID, UserID: UserID, Content: input.Content, Likes: input.Likes}
 	db.Create(&comment)
 
 	c.JSON(http.StatusOK, gin.H{"data": comment})
@@ -189,7 +191,6 @@ func UpdateComment(c *gin.Context) {
 
 	var comment models.Comment
 	var review models.Review
-	var user models.User
 	if err := db.Where("id = ?", c.Param("id")).First(&comment).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
@@ -206,14 +207,8 @@ func UpdateComment(c *gin.Context) {
 		return
 	}
 
-	if err := db.Where("id = ?", input.UserID).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "UserID not found!"})
-		return
-	}
-
 	var updatedInput models.Comment
 	updatedInput.ReviewID = input.ReviewID
-	updatedInput.UserID = input.UserID
 	updatedInput.Likes = input.Likes
 	updatedInput.Content = input.Content
 	updatedInput.UpdatedAt = time.Now()

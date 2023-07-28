@@ -40,8 +40,6 @@ definitions:
         type: integer
       review_id:
         type: integer
-      user_id:
-        type: integer
     type: object
   controllers.gameInput:
     properties:
@@ -73,8 +71,6 @@ definitions:
         type: integer
       title:
         type: string
-      user_id:
-        type: integer
     type: object
   models.Category:
     properties:

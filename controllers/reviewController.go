@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"Final/models"
+	"Final/utils/token"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -14,7 +15,6 @@ import (
 type reviewInput struct {
 	GameID   int    `json:"game_id"`
 	RatingID int    `json:"rating_id"`
-	UserID   int    `json:"user_id"`
 	Title    string `json:"title" gorm:"type:varchar(255)"`
 	Content  string `json:"content" gorm:"type:text"`
 }
@@ -102,7 +102,6 @@ func CreateReview(c *gin.Context) {
 	var input reviewInput
 	var game models.Game
 	var rating models.Rating
-	var user models.User
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
@@ -113,17 +112,19 @@ func CreateReview(c *gin.Context) {
 		return
 	}
 
-	if err := db.Where("id = ?", input.UserID).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "UserID not found!"})
-		return
-	}
-
 	if err := db.Where("id = ?", input.RatingID).First(&rating).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "RatingID not found!"})
 		return
 	}
 
-	review := models.Review{GameID: input.GameID, RatingID: input.RatingID, Title: input.Title, Content: input.Content, UserID: input.UserID}
+	UserID, err := token.ExtractUserID(c)
+	if err != nil {
+		c.String(http.StatusUnauthorized, err.Error())
+		c.Abort()
+		return
+	}
+
+	review := models.Review{GameID: input.GameID, RatingID: input.RatingID, Title: input.Title, Content: input.Content, UserID: UserID}
 	db.Create(&review)
 
 	c.JSON(http.StatusOK, gin.H{"data": review})
@@ -331,11 +332,10 @@ func GetReviewById(c *gin.Context) {
 // @Router /reviews/{id} [patch]
 func UpdateReview(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	// Get model if exist
+
 	var review models.Review
 	var rating models.Rating
 	var game models.Game
-	var user models.User
 	if err := db.Where("id = ?", c.Param("id")).First(&review).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
@@ -349,11 +349,6 @@ func UpdateReview(c *gin.Context) {
 
 	if err := db.Where("id = ?", input.RatingID).First(&rating).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "RatingID not found!"})
-		return
-	}
-
-	if err := db.Where("id = ?", input.UserID).First(&user).Error; err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "UserID not found!"})
 		return
 	}
 
