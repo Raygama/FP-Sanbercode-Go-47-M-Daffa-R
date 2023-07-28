@@ -10,7 +10,7 @@ import (
 )
 
 func ConnectDatabase() *gorm.DB {
-	username := utils.Getenv("MYSQLDATABASE", "root")
+	username := utils.Getenv("MYSQLUSER", "root")
 	password := utils.Getenv("MYSQLPASSWORD", "8J2b5pX9RygNKe5iXC0s")
 	host := utils.Getenv("MYSQLHOST", "containers-us-west-116.railway.app")
 	port := utils.Getenv("MYSQLPORT", "7659")
