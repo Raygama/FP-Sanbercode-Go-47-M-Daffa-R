@@ -12,7 +12,7 @@ import (
 func ConnectDatabase() *gorm.DB {
 	username := utils.Getenv("root", "root")
 	password := utils.Getenv("8J2b5pX9RygNKe5iXC0s", "Antimaling2@")
-	host := utils.Getenv("containers-us-west-116.railway.app", "127.0.0.1")
+	host := utils.Getenv("containers-us-west-116.railway.app", "0.0.0.0")
 	port := utils.Getenv("7659", "3306")
 	database := utils.Getenv("railway", "db_game")
 
