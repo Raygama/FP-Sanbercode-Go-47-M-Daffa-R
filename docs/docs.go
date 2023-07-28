@@ -35,6 +35,14 @@ const docTemplate = `{
                     "Category"
                 ],
                 "summary": "Get all Category.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sort by Id (asc or desc)",
+                        "name": "sortById",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -225,6 +233,30 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title filter (case insensitive search)",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Minimum year filter",
+                        "name": "minYear",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Maximum year filter",
+                        "name": "maxYear",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by title (asc or desc)",
+                        "name": "sortByTitle",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -250,6 +282,20 @@ const docTemplate = `{
                     "Comment"
                 ],
                 "summary": "Get all Comments.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sort by likes (asc or desc)",
+                        "name": "sortByLikes",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by created_at (asc or desc)",
+                        "name": "sortByCreatedAt",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -421,6 +467,32 @@ const docTemplate = `{
                     "Game"
                 ],
                 "summary": "Get all Game.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Title filter (case insensitive search)",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Minimum year filter",
+                        "name": "minYear",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Maximum year filter",
+                        "name": "maxYear",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by title (asc or desc)",
+                        "name": "sortByTitle",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -623,6 +695,30 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title filter (case insensitive search)",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by title (asc or desc)",
+                        "name": "sortByTitle",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by RatingID (asc or desc)",
+                        "name": "sortByRatingID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by created_at (asc or desc)",
+                        "name": "sortByCreatedAt",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -680,6 +776,14 @@ const docTemplate = `{
                     "Rating"
                 ],
                 "summary": "Get all Rating.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Sort by Id (asc or desc)",
+                        "name": "sortById",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -870,6 +974,30 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title filter (case insensitive search)",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by title (asc or desc)",
+                        "name": "sortByTitle",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by RatingID (asc or desc)",
+                        "name": "sortByRatingID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by created_at (asc or desc)",
+                        "name": "sortByCreatedAt",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -927,6 +1055,32 @@ const docTemplate = `{
                     "Review"
                 ],
                 "summary": "Get all reviews.",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "description": "Title filter (case insensitive search)",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by title (asc or desc)",
+                        "name": "sortByTitle",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by RatingID (asc or desc)",
+                        "name": "sortByRatingID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by created_at (asc or desc)",
+                        "name": "sortByCreatedAt",
+                        "in": "query"
+                    }
+                ],
                 "responses": {
                     "200": {
                         "description": "OK",
@@ -998,6 +1152,30 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title filter (case insensitive search)",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by title (asc or desc)",
+                        "name": "sortByTitle",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by RatingID (asc or desc)",
+                        "name": "sortByRatingID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by created_at (asc or desc)",
+                        "name": "sortByCreatedAt",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1117,6 +1295,18 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by likes (asc or desc)",
+                        "name": "sortByLikes",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by created_at (asc or desc)",
+                        "name": "sortByCreatedAt",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1149,6 +1339,18 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by likes (asc or desc)",
+                        "name": "sortByLikes",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by created_at (asc or desc)",
+                        "name": "sortByCreatedAt",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1181,6 +1383,30 @@ const docTemplate = `{
                         "name": "id",
                         "in": "path",
                         "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Title filter (case insensitive search)",
+                        "name": "title",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by title (asc or desc)",
+                        "name": "sortByTitle",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by RatingID (asc or desc)",
+                        "name": "sortByRatingID",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Sort by created_at (asc or desc)",
+                        "name": "sortByCreatedAt",
+                        "in": "query"
                     }
                 ],
                 "responses": {
@@ -1287,10 +1513,10 @@ const docTemplate = `{
         "controllers.ratingInput": {
             "type": "object",
             "properties": {
-                "core": {
+                "deskripsi": {
                     "type": "string"
                 },
-                "deskripsi": {
+                "score": {
                     "type": "string"
                 }
             }

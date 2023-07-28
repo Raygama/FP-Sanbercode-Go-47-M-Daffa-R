@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"Final/models"
@@ -23,13 +24,64 @@ type reviewInput struct {
 // @Description Get a list of reviews.
 // @Tags Review
 // @Produce json
+// @Param title query string false "Title filter (case insensitive search)"
+// @Param sortByTitle query string false "Sort by title (asc or desc)"
+// @Param sortByRatingID query string false "Sort by RatingID (asc or desc)"
+// @Param sortByCreatedAt query string false "Sort by created_at (asc or desc)"
 // @Success 200 {object} []models.Review
 // @Router /reviews [get]
 func GetAllReview(c *gin.Context) {
-	// get db from gin context
 	db := c.MustGet("db").(*gorm.DB)
+
+	title := c.Query("title")
+	sortByTitle := c.Query("sortByTitle")
+	sortByRatingID := c.Query("sortByRatingID")
+	sortByCreatedAt := c.Query("sortByCreatedAt")
+
 	var reviews []models.Review
-	db.Find(&reviews)
+	query := db
+
+	if title != "" {
+		query = query.Where("LOWER(title) LIKE ?", "%"+strings.ToLower(title)+"%")
+	}
+
+	if sortByTitle != "" {
+		if strings.ToLower(sortByTitle) == "asc" {
+			query = query.Order("title asc")
+		} else if strings.ToLower(sortByTitle) == "desc" {
+			query = query.Order("title desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByTitle parameter"})
+			return
+		}
+	}
+
+	if sortByRatingID != "" {
+		if strings.ToLower(sortByRatingID) == "asc" {
+			query = query.Order("rating_id asc")
+		} else if strings.ToLower(sortByRatingID) == "desc" {
+			query = query.Order("rating_id desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByRatingID parameter"})
+			return
+		}
+	}
+
+	if sortByCreatedAt != "" {
+		if strings.ToLower(sortByCreatedAt) == "asc" {
+			query = query.Order("created_at asc")
+		} else if strings.ToLower(sortByCreatedAt) == "desc" {
+			query = query.Order("created_at desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByCreatedAt parameter"})
+			return
+		}
+	}
+
+	if err := query.Find(&reviews).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data not found"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"data": reviews})
 }
@@ -83,14 +135,44 @@ func CreateReview(c *gin.Context) {
 // @Tags Review
 // @Produce json
 // @Param id path string true "Review id"
+// @Param sortByLikes query string false "Sort by likes (asc or desc)"
+// @Param sortByCreatedAt query string false "Sort by created_at (asc or desc)"
 // @Success 200 {object} []models.Comment
 // @Router /reviews/{id}/comments [get]
 func GetCommentsByReviewId(c *gin.Context) {
-	var comments []models.Comment
+	reviewID := c.Param("id")
 
 	db := c.MustGet("db").(*gorm.DB)
 
-	if err := db.Where("review_id = ?", c.Param("id")).Find(&comments).Error; err != nil {
+	sortByLikes := c.Query("sortByLikes")
+	sortByCreatedAt := c.Query("sortByCreatedAt")
+
+	var comments []models.Comment
+	query := db.Where("review_id = ?", reviewID)
+
+	if sortByLikes != "" {
+		if strings.ToLower(sortByLikes) == "asc" {
+			query = query.Order("likes asc")
+		} else if strings.ToLower(sortByLikes) == "desc" {
+			query = query.Order("likes desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByLikes parameter"})
+			return
+		}
+	}
+
+	if sortByCreatedAt != "" {
+		if strings.ToLower(sortByCreatedAt) == "asc" {
+			query = query.Order("created_at asc")
+		} else if strings.ToLower(sortByCreatedAt) == "desc" {
+			query = query.Order("created_at desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByCreatedAt parameter"})
+			return
+		}
+	}
+
+	if err := query.Find(&comments).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Data not found"})
 		return
 	}
@@ -104,14 +186,62 @@ func GetCommentsByReviewId(c *gin.Context) {
 // @Tags User
 // @Produce json
 // @Param id path string true "User id"
+// @Param title query string false "Title filter (case insensitive search)"
+// @Param sortByTitle query string false "Sort by title (asc or desc)"
+// @Param sortByRatingID query string false "Sort by RatingID (asc or desc)"
+// @Param sortByCreatedAt query string false "Sort by created_at (asc or desc)"
 // @Success 200 {object} []models.Review
 // @Router /users/{id}/reviews [get]
 func GetReviewsByUserId(c *gin.Context) {
-	var reviews []models.Review
-
+	userID := c.Param("id")
 	db := c.MustGet("db").(*gorm.DB)
 
-	if err := db.Where("user_id = ?", c.Param("id")).Find(&reviews).Error; err != nil {
+	title := c.Query("title")
+	sortByTitle := c.Query("sortByTitle")
+	sortByRatingID := c.Query("sortByRatingID")
+	sortByCreatedAt := c.Query("sortByCreatedAt")
+
+	var reviews []models.Review
+	query := db.Where("user_id = ?", userID)
+
+	if title != "" {
+		query = query.Where("LOWER(title) LIKE ?", "%"+strings.ToLower(title)+"%")
+	}
+
+	if sortByTitle != "" {
+		if strings.ToLower(sortByTitle) == "asc" {
+			query = query.Order("title asc")
+		} else if strings.ToLower(sortByTitle) == "desc" {
+			query = query.Order("title desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByTitle parameter"})
+			return
+		}
+	}
+
+	if sortByRatingID != "" {
+		if strings.ToLower(sortByRatingID) == "asc" {
+			query = query.Order("rating_id asc")
+		} else if strings.ToLower(sortByRatingID) == "desc" {
+			query = query.Order("rating_id desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByRatingID parameter"})
+			return
+		}
+	}
+
+	if sortByCreatedAt != "" {
+		if strings.ToLower(sortByCreatedAt) == "asc" {
+			query = query.Order("created_at asc")
+		} else if strings.ToLower(sortByCreatedAt) == "desc" {
+			query = query.Order("created_at desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByCreatedAt parameter"})
+			return
+		}
+	}
+
+	if err := query.Find(&reviews).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Data not found"})
 		return
 	}
@@ -125,13 +255,62 @@ func GetReviewsByUserId(c *gin.Context) {
 // @Tags Review
 // @Produce json
 // @Param id path string true "review id"
+// @Param title query string false "Title filter (case insensitive search)"
+// @Param sortByTitle query string false "Sort by title (asc or desc)"
+// @Param sortByRatingID query string false "Sort by RatingID (asc or desc)"
+// @Param sortByCreatedAt query string false "Sort by created_at (asc or desc)"
 // @Success 200 {object} models.Review
 // @Router /reviews/{id} [get]
-func GetReviewById(c *gin.Context) { // Get model if exist
-	var review models.Review
-
+func GetReviewById(c *gin.Context) {
+	reviewID := c.Param("id")
 	db := c.MustGet("db").(*gorm.DB)
-	if err := db.Where("id = ?", c.Param("id")).First(&review).Error; err != nil {
+
+	var review models.Review
+	query := db.Where("id = ?", reviewID)
+
+	title := c.Query("title")
+	sortByTitle := c.Query("sortByTitle")
+	sortByRatingID := c.Query("sortByRatingID")
+	sortByCreatedAt := c.Query("sortByCreatedAt")
+
+	if title != "" {
+		query = query.Where("LOWER(title) LIKE ?", "%"+strings.ToLower(title)+"%")
+	}
+
+	if sortByTitle != "" {
+		if strings.ToLower(sortByTitle) == "asc" {
+			query = query.Order("title asc")
+		} else if strings.ToLower(sortByTitle) == "desc" {
+			query = query.Order("title desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByTitle parameter"})
+			return
+		}
+	}
+
+	if sortByRatingID != "" {
+		if strings.ToLower(sortByRatingID) == "asc" {
+			query = query.Order("rating_id asc")
+		} else if strings.ToLower(sortByRatingID) == "desc" {
+			query = query.Order("rating_id desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByRatingID parameter"})
+			return
+		}
+	}
+
+	if sortByCreatedAt != "" {
+		if strings.ToLower(sortByCreatedAt) == "asc" {
+			query = query.Order("created_at asc")
+		} else if strings.ToLower(sortByCreatedAt) == "desc" {
+			query = query.Order("created_at desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByCreatedAt parameter"})
+			return
+		}
+	}
+
+	if err := query.First(&review).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Record not found!"})
 		return
 	}

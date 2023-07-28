@@ -58,9 +58,9 @@ definitions:
     type: object
   controllers.ratingInput:
     properties:
-      core:
-        type: string
       deskripsi:
+        type: string
+      score:
         type: string
     type: object
   controllers.reviewInput:
@@ -158,6 +158,11 @@ paths:
   /categories:
     get:
       description: Get a list of Category.
+      parameters:
+      - description: Sort by Id (asc or desc)
+        in: query
+        name: sortById
+        type: string
       produces:
       - application/json
       responses:
@@ -282,6 +287,22 @@ paths:
         name: id
         required: true
         type: string
+      - description: Title filter (case insensitive search)
+        in: query
+        name: title
+        type: string
+      - description: Minimum year filter
+        in: query
+        name: minYear
+        type: integer
+      - description: Maximum year filter
+        in: query
+        name: maxYear
+        type: integer
+      - description: Sort by title (asc or desc)
+        in: query
+        name: sortByTitle
+        type: string
       produces:
       - application/json
       responses:
@@ -297,6 +318,15 @@ paths:
   /comments:
     get:
       description: Get a list of Comments.
+      parameters:
+      - description: Sort by likes (asc or desc)
+        in: query
+        name: sortByLikes
+        type: string
+      - description: Sort by created_at (asc or desc)
+        in: query
+        name: sortByCreatedAt
+        type: string
       produces:
       - application/json
       responses:
@@ -408,6 +438,23 @@ paths:
   /games:
     get:
       description: Get a list of Game.
+      parameters:
+      - description: Title filter (case insensitive search)
+        in: query
+        name: title
+        type: string
+      - description: Minimum year filter
+        in: query
+        name: minYear
+        type: integer
+      - description: Maximum year filter
+        in: query
+        name: maxYear
+        type: integer
+      - description: Sort by title (asc or desc)
+        in: query
+        name: sortByTitle
+        type: string
       produces:
       - application/json
       responses:
@@ -539,6 +586,22 @@ paths:
         name: id
         required: true
         type: string
+      - description: Title filter (case insensitive search)
+        in: query
+        name: title
+        type: string
+      - description: Sort by title (asc or desc)
+        in: query
+        name: sortByTitle
+        type: string
+      - description: Sort by RatingID (asc or desc)
+        in: query
+        name: sortByRatingID
+        type: string
+      - description: Sort by created_at (asc or desc)
+        in: query
+        name: sortByCreatedAt
+        type: string
       produces:
       - application/json
       responses:
@@ -575,6 +638,11 @@ paths:
   /ratings:
     get:
       description: Get a list of Rating.
+      parameters:
+      - description: Sort by Id (asc or desc)
+        in: query
+        name: sortById
+        type: string
       produces:
       - application/json
       responses:
@@ -699,6 +767,22 @@ paths:
         name: id
         required: true
         type: string
+      - description: Title filter (case insensitive search)
+        in: query
+        name: title
+        type: string
+      - description: Sort by title (asc or desc)
+        in: query
+        name: sortByTitle
+        type: string
+      - description: Sort by RatingID (asc or desc)
+        in: query
+        name: sortByRatingID
+        type: string
+      - description: Sort by created_at (asc or desc)
+        in: query
+        name: sortByCreatedAt
+        type: string
       produces:
       - application/json
       responses:
@@ -735,6 +819,23 @@ paths:
   /reviews:
     get:
       description: Get a list of reviews.
+      parameters:
+      - description: Title filter (case insensitive search)
+        in: query
+        name: title
+        type: string
+      - description: Sort by title (asc or desc)
+        in: query
+        name: sortByTitle
+        type: string
+      - description: Sort by RatingID (asc or desc)
+        in: query
+        name: sortByRatingID
+        type: string
+      - description: Sort by created_at (asc or desc)
+        in: query
+        name: sortByCreatedAt
+        type: string
       produces:
       - application/json
       responses:
@@ -809,6 +910,22 @@ paths:
         name: id
         required: true
         type: string
+      - description: Title filter (case insensitive search)
+        in: query
+        name: title
+        type: string
+      - description: Sort by title (asc or desc)
+        in: query
+        name: sortByTitle
+        type: string
+      - description: Sort by RatingID (asc or desc)
+        in: query
+        name: sortByRatingID
+        type: string
+      - description: Sort by created_at (asc or desc)
+        in: query
+        name: sortByCreatedAt
+        type: string
       produces:
       - application/json
       responses:
@@ -859,6 +976,14 @@ paths:
         name: id
         required: true
         type: string
+      - description: Sort by likes (asc or desc)
+        in: query
+        name: sortByLikes
+        type: string
+      - description: Sort by created_at (asc or desc)
+        in: query
+        name: sortByCreatedAt
+        type: string
       produces:
       - application/json
       responses:
@@ -880,6 +1005,14 @@ paths:
         name: id
         required: true
         type: string
+      - description: Sort by likes (asc or desc)
+        in: query
+        name: sortByLikes
+        type: string
+      - description: Sort by created_at (asc or desc)
+        in: query
+        name: sortByCreatedAt
+        type: string
       produces:
       - application/json
       responses:
@@ -900,6 +1033,22 @@ paths:
         in: path
         name: id
         required: true
+        type: string
+      - description: Title filter (case insensitive search)
+        in: query
+        name: title
+        type: string
+      - description: Sort by title (asc or desc)
+        in: query
+        name: sortByTitle
+        type: string
+      - description: Sort by RatingID (asc or desc)
+        in: query
+        name: sortByRatingID
+        type: string
+      - description: Sort by created_at (asc or desc)
+        in: query
+        name: sortByCreatedAt
         type: string
       produces:
       - application/json

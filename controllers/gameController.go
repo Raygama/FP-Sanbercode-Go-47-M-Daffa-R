@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"net/http"
+	"strconv"
+	"strings"
 
 	"Final/models"
 
@@ -17,18 +19,66 @@ type gameInput struct {
 	YearPublished string `json:"year_published" gorm:"type:varchar(10)"`
 }
 
+type filterInput struct {
+	Title   string `form:"title"`
+	MinYear int    `form:"minYear"`
+	MaxYear int    `form:"maxYear"`
+}
+
 // GetAllGames godoc
 // @Summary Get all Game.
 // @Description Get a list of Game.
 // @Tags Game
 // @Produce json
+// @Param title query string false "Title filter (case insensitive search)"
+// @Param minYear query integer false "Minimum year filter"
+// @Param maxYear query integer false "Maximum year filter"
+// @Param sortByTitle query string false "Sort by title (asc or desc)"
 // @Success 200 {object} []models.Game
 // @Router /games [get]
 func GetAllGames(c *gin.Context) {
-	// get db from gin context
 	db := c.MustGet("db").(*gorm.DB)
+
+	query := db
+	title := c.Query("title")
+	if title != "" {
+		query = query.Where("LOWER(nama) LIKE ?", "%"+strings.ToLower(title)+"%")
+	}
+
+	minYearStr := c.Query("minYear")
+	if minYearStr != "" {
+		minYear, err := strconv.Atoi(minYearStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid minYear parameter"})
+			return
+		}
+		query = query.Where("year_published >= ?", minYear)
+	}
+
+	maxYearStr := c.Query("maxYear")
+	if maxYearStr != "" {
+		maxYear, err := strconv.Atoi(maxYearStr)
+		if err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid maxYear parameter"})
+			return
+		}
+		query = query.Where("year_published <= ?", maxYear)
+	}
+
+	sortByTitle := c.DefaultQuery("sortByTitle", "")
+	if sortByTitle != "" {
+		if strings.ToLower(sortByTitle) == "asc" {
+			query = query.Order("nama asc")
+		} else if strings.ToLower(sortByTitle) == "desc" {
+			query = query.Order("nama desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByTitle parameter"})
+			return
+		}
+	}
+
 	var games []models.Game
-	db.Find(&games)
+	query.Find(&games)
 
 	c.JSON(http.StatusOK, gin.H{"data": games})
 }
@@ -68,7 +118,7 @@ func CreateGames(c *gin.Context) {
 // @Security BearerToken
 // @Success 200 {object} models.Game
 // @Router /games/{id} [get]
-func GetGamesById(c *gin.Context) { // Get model if exist
+func GetGamesById(c *gin.Context) {
 	var game models.Game
 
 	db := c.MustGet("db").(*gorm.DB)
@@ -86,14 +136,63 @@ func GetGamesById(c *gin.Context) { // Get model if exist
 // @Tags Game
 // @Produce json
 // @Param id path string true "Game id"
+// @Param title query string false "Title filter (case insensitive search)"
+// @Param sortByTitle query string false "Sort by title (asc or desc)"
+// @Param sortByRatingID query string false "Sort by RatingID (asc or desc)"
+// @Param sortByCreatedAt query string false "Sort by created_at (asc or desc)"
 // @Success 200 {object} []models.Review
 // @Router /games/{id}/reviews [get]
 func GetReviewsByGameId(c *gin.Context) {
-	var reviews []models.Review
+	gameID := c.Param("id")
 
 	db := c.MustGet("db").(*gorm.DB)
 
-	if err := db.Where("game_id = ?", c.Param("id")).Find(&reviews).Error; err != nil {
+	title := c.Query("title")
+	sortByTitle := c.Query("sortByTitle")
+	sortByRatingID := c.Query("sortByRatingID")
+	sortByCreatedAt := c.Query("sortByCreatedAt")
+
+	var reviews []models.Review
+	query := db.Where("game_id = ?", gameID)
+
+	if title != "" {
+		query = query.Where("LOWER(title) LIKE ?", "%"+strings.ToLower(title)+"%")
+	}
+
+	if sortByTitle != "" {
+		if strings.ToLower(sortByTitle) == "asc" {
+			query = query.Order("title asc")
+		} else if strings.ToLower(sortByTitle) == "desc" {
+			query = query.Order("title desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByTitle parameter"})
+			return
+		}
+	}
+
+	if sortByRatingID != "" {
+		if strings.ToLower(sortByRatingID) == "asc" {
+			query = query.Order("rating_id asc")
+		} else if strings.ToLower(sortByRatingID) == "desc" {
+			query = query.Order("rating_id desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByRatingID parameter"})
+			return
+		}
+	}
+
+	if sortByCreatedAt != "" {
+		if strings.ToLower(sortByCreatedAt) == "asc" {
+			query = query.Order("created_at asc")
+		} else if strings.ToLower(sortByCreatedAt) == "desc" {
+			query = query.Order("created_at desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByCreatedAt parameter"})
+			return
+		}
+	}
+
+	if err := query.Find(&reviews).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Data not found"})
 		return
 	}
@@ -121,7 +220,6 @@ func UpdateGames(c *gin.Context) {
 		return
 	}
 
-	// Validate input
 	var input gameInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})

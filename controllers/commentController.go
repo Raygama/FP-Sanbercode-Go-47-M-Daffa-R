@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 	"time"
 
 	"Final/models"
@@ -22,13 +23,45 @@ type commentInput struct {
 // @Description Get a list of Comments.
 // @Tags Comment
 // @Produce json
+// @Param sortByLikes query string false "Sort by likes (asc or desc)"
+// @Param sortByCreatedAt query string false "Sort by created_at (asc or desc)"
 // @Success 200 {object} []models.Comment
 // @Router /comments [get]
 func GetAllComment(c *gin.Context) {
-	// get db from gin context
 	db := c.MustGet("db").(*gorm.DB)
+
+	sortByLikes := c.Query("sortByLikes")
+	sortByCreatedAt := c.Query("sortByCreatedAt")
+
 	var comments []models.Comment
-	db.Find(&comments)
+	query := db
+
+	if sortByLikes != "" {
+		if strings.ToLower(sortByLikes) == "asc" {
+			query = query.Order("likes asc")
+		} else if strings.ToLower(sortByLikes) == "desc" {
+			query = query.Order("likes desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByLikes parameter"})
+			return
+		}
+	}
+
+	if sortByCreatedAt != "" {
+		if strings.ToLower(sortByCreatedAt) == "asc" {
+			query = query.Order("created_at asc")
+		} else if strings.ToLower(sortByCreatedAt) == "desc" {
+			query = query.Order("created_at desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByCreatedAt parameter"})
+			return
+		}
+	}
+
+	if err := query.Find(&comments).Error; err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Data not found"})
+		return
+	}
 
 	c.JSON(http.StatusOK, gin.H{"data": comments})
 }
@@ -78,7 +111,7 @@ func CreateComment(c *gin.Context) {
 // @Param id path string true "Comment id"
 // @Success 200 {object} models.Comment
 // @Router /comments/{id} [get]
-func GetCommentById(c *gin.Context) { // Get model if exist
+func GetCommentById(c *gin.Context) {
 	var comment models.Comment
 
 	db := c.MustGet("db").(*gorm.DB)
@@ -96,14 +129,43 @@ func GetCommentById(c *gin.Context) { // Get model if exist
 // @Tags User
 // @Produce json
 // @Param id path string true "User id"
+// @Param sortByLikes query string false "Sort by likes (asc or desc)"
+// @Param sortByCreatedAt query string false "Sort by created_at (asc or desc)"
 // @Success 200 {object} []models.Comment
 // @Router /users/{id}/comments [get]
 func GetCommentsByUserId(c *gin.Context) {
-	var comments []models.Comment
-
+	userID := c.Param("id")
 	db := c.MustGet("db").(*gorm.DB)
 
-	if err := db.Where("user_id = ?", c.Param("id")).Find(&comments).Error; err != nil {
+	sortByLikes := c.Query("sortByLikes")
+	sortByCreatedAt := c.Query("sortByCreatedAt")
+
+	var comments []models.Comment
+	query := db.Where("user_id = ?", userID)
+
+	if sortByLikes != "" {
+		if strings.ToLower(sortByLikes) == "asc" {
+			query = query.Order("likes asc")
+		} else if strings.ToLower(sortByLikes) == "desc" {
+			query = query.Order("likes desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByLikes parameter"})
+			return
+		}
+	}
+
+	if sortByCreatedAt != "" {
+		if strings.ToLower(sortByCreatedAt) == "asc" {
+			query = query.Order("created_at asc")
+		} else if strings.ToLower(sortByCreatedAt) == "desc" {
+			query = query.Order("created_at desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByCreatedAt parameter"})
+			return
+		}
+	}
+
+	if err := query.Find(&comments).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Data not found"})
 		return
 	}
@@ -124,7 +186,6 @@ func GetCommentsByUserId(c *gin.Context) {
 // @Router /comments/{id} [patch]
 func UpdateComment(c *gin.Context) {
 	db := c.MustGet("db").(*gorm.DB)
-	// Get model if exist
 
 	var comment models.Comment
 	var review models.Review
@@ -171,7 +232,6 @@ func UpdateComment(c *gin.Context) {
 // @Success 200 {object} map[string]boolean
 // @Router /comments/{id} [delete]
 func DeleteComment(c *gin.Context) {
-	// Get model if exist
 	db := c.MustGet("db").(*gorm.DB)
 	var comment models.Comment
 	if err := db.Where("id = ?", c.Param("id")).First(&comment).Error; err != nil {

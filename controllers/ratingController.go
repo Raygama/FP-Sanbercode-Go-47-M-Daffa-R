@@ -2,6 +2,7 @@ package controllers
 
 import (
 	"net/http"
+	"strings"
 
 	"Final/models"
 
@@ -10,7 +11,7 @@ import (
 )
 
 type ratingInput struct {
-	Score     string `json:"core"`
+	Score     string `json:"score"`
 	Deskripsi string `json:"deskripsi"`
 }
 
@@ -19,13 +20,28 @@ type ratingInput struct {
 // @Description Get a list of Rating.
 // @Tags Rating
 // @Produce json
+// @Param sortById query string false "Sort by Id (asc or desc)"
 // @Success 200 {object} []models.Rating
 // @Router /ratings [get]
 func GetAllRating(c *gin.Context) {
-	// get db from gin context
 	db := c.MustGet("db").(*gorm.DB)
+
+	query := db
+
+	sortById := c.DefaultQuery("sortById", "")
+	if sortById != "" {
+		if strings.ToLower(sortById) == "asc" {
+			query = query.Order("id asc")
+		} else if strings.ToLower(sortById) == "desc" {
+			query = query.Order("id desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortById parameter"})
+			return
+		}
+	}
+
 	var ratings []models.Rating
-	db.Find(&ratings)
+	query.Find(&ratings)
 
 	c.JSON(http.StatusOK, gin.H{"data": ratings})
 }
@@ -63,7 +79,7 @@ func CreateRating(c *gin.Context) {
 // @Param id path string true "rating id"
 // @Success 200 {object} models.Rating
 // @Router /ratings/{id} [get]
-func GetRatingById(c *gin.Context) { // Get model if exist
+func GetRatingById(c *gin.Context) {
 	var rating models.Rating
 
 	db := c.MustGet("db").(*gorm.DB)
@@ -81,14 +97,62 @@ func GetRatingById(c *gin.Context) { // Get model if exist
 // @Tags Rating
 // @Produce json
 // @Param id path string true "Rating id"
+// @Param title query string false "Title filter (case insensitive search)"
+// @Param sortByTitle query string false "Sort by title (asc or desc)"
+// @Param sortByRatingID query string false "Sort by RatingID (asc or desc)"
+// @Param sortByCreatedAt query string false "Sort by created_at (asc or desc)"
 // @Success 200 {object} []models.Review
 // @Router /ratings/{id}/reviews [get]
 func GetReviewsByRatingId(c *gin.Context) {
-	var reviews []models.Review
-
+	ratingID := c.Param("id")
 	db := c.MustGet("db").(*gorm.DB)
 
-	if err := db.Where("rating_id = ?", c.Param("id")).Find(&reviews).Error; err != nil {
+	title := c.Query("title")
+	sortByTitle := c.Query("sortByTitle")
+	sortByRatingID := c.Query("sortByRatingID")
+	sortByCreatedAt := c.Query("sortByCreatedAt")
+
+	var reviews []models.Review
+	query := db.Where("rating_id = ?", ratingID)
+
+	if title != "" {
+		query = query.Where("LOWER(title) LIKE ?", "%"+strings.ToLower(title)+"%")
+	}
+
+	if sortByTitle != "" {
+		if strings.ToLower(sortByTitle) == "asc" {
+			query = query.Order("title asc")
+		} else if strings.ToLower(sortByTitle) == "desc" {
+			query = query.Order("title desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByTitle parameter"})
+			return
+		}
+	}
+
+	if sortByRatingID != "" {
+		if strings.ToLower(sortByRatingID) == "asc" {
+			query = query.Order("rating_id asc")
+		} else if strings.ToLower(sortByRatingID) == "desc" {
+			query = query.Order("rating_id desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByRatingID parameter"})
+			return
+		}
+	}
+
+	if sortByCreatedAt != "" {
+		if strings.ToLower(sortByCreatedAt) == "asc" {
+			query = query.Order("created_at asc")
+		} else if strings.ToLower(sortByCreatedAt) == "desc" {
+			query = query.Order("created_at desc")
+		} else {
+			c.JSON(http.StatusBadRequest, gin.H{"error": "Invalid sortByCreatedAt parameter"})
+			return
+		}
+	}
+
+	if err := query.Find(&reviews).Error; err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Data not found"})
 		return
 	}
@@ -116,7 +180,6 @@ func UpdateRating(c *gin.Context) {
 		return
 	}
 
-	// Validate input
 	var input ratingInput
 	if err := c.ShouldBindJSON(&input); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
