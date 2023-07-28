@@ -1,4 +1,17 @@
 definitions:
+  controllers.ChangePWInput:
+    properties:
+      new_password:
+        type: string
+      old_password:
+        type: string
+      username:
+        type: string
+    required:
+    - new_password
+    - old_password
+    - username
+    type: object
   controllers.LoginInput:
     properties:
       password:
@@ -311,6 +324,33 @@ paths:
       summary: Get Games.
       tags:
       - Category
+  /change_password:
+    patch:
+      description: Change user's password by providing the correct old password.
+      parameters:
+      - description: 'Authorization. How to input in swagger : ''Bearer <insert_your_token_here>'''
+        in: header
+        name: Authorization
+        required: true
+        type: string
+      - description: the body to change user's password
+        in: body
+        name: Body
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.ChangePWInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Password updated successfully
+          schema:
+            type: string
+      security:
+      - BearerToken: []
+      summary: Change user's password.
+      tags:
+      - Auth
   /comments:
     get:
       description: Get a list of Comments.
