@@ -6,13 +6,14 @@ import (
 
 	"Final/models"
 	"fmt"
+	"os"
 )
 
 func ConnectDatabase() *gorm.DB {
-	username := "root"
-	password := "8J2b5pX9RygNKe5iXC0s"
-	host := "containers-us-west-116.railway.app"
-	database := "railway"
+	username := os.Getenv("MYSQLUSER")
+	password := os.Getenv("MYSQLPASSWORD")
+	host := os.Getenv("MYSQLHOST")
+	database := os.Getenv("MYSQLDATABASE")
 
 	dsn := fmt.Sprintf("%v:%v@%v/%v?charset=utf8mb4&parseTime=True&loc=Local", username, password, host, database)
 
