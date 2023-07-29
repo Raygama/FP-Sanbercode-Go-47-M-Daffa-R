@@ -31,11 +31,13 @@ func main() {
 		}
 	}
 	// programmatically set swagger info
-	docs.SwaggerInfo.Title = "Swagger Example API"
-	docs.SwaggerInfo.Description = "This is a sample Game Review."
+	docs.SwaggerInfo.Title = "Swagger Game Review API"
+	docs.SwaggerInfo.Description = "This is a simple Game Review."
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "localhost:8080"
-	docs.SwaggerInfo.Schemes = []string{"http", "https"}
+	envHost := utils.Getenv("ENV_HOST", "localhost")
+	envScheme := utils.Getenv("ENV_SCHEME", "http")
+	docs.SwaggerInfo.Host = envHost
+	docs.SwaggerInfo.Schemes = []string{envScheme}
 
 	// database connection
 	db := config.ConnectDatabase()
@@ -44,6 +46,6 @@ func main() {
 
 	// router
 	r := routes.SetupRouter(db)
-	r.Run(":$PORT")
+	r.Run(":" + utils.Getenv("PORT", "8080")) // Use the PORT environment variable for dynamic port assignment
 
 }
